@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 500px;
+		width: 800px;
+		position:relative;
+		left:20%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-marker-clusterer/1.0.0/markerclusterer_compiled.js"> </script>
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800,300' rel='stylesheet' type='text/css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+  </head>
+  <body>
+<script src="https://www.gstatic.com/firebasejs/4.5.2/firebase.js"></script>
+ <script src="/__/firebase/4.5.0/firebase-app.js"></script>
+    <script src="/__/firebase/4.5.0/firebase-auth.js"></script>
+    <script src="/__/firebase/4.5.0/firebase-database.js"></script>
+	
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAn5oa7nGdzFwQYl-npfof1dWsXTSbw3yE",
+    authDomain: "shariqtopi.firebaseapp.com",
+    databaseURL: "https://shariqtopi.firebaseio.com",
+    projectId: "shariqtopi",
+    storageBucket: "shariqtopi.appspot.com",
+    messagingSenderId: "870839015587"
+  };
+  firebase.initializeApp(config);
+  
+  
+  var database = firebase.database(); 
+
+ firebase.database().ref('/users').then(snapshots=>
+          {
+            snapshots.forEach(snapshot => 
+            {
+                if(snapshot.val())
+                {
+                  console.log(snapshot.val())
+
+                }
+            })
+			});
+</script>
+   <i class="fa fa-bars toggle_menu"> </i>
+    <div class="sidebar_menu">
+        <i class="fa fa-times"></i>
+        <div class="boxed_item_holder">
+            <a href="index.php"><h1 class="boxed_item">LocalMats <span class="logo_title"> <br>Online Location Viewer</span></h1></a>
+        </div>
+        <ul class="navigation_selection"> <span class="nav_heading">Users</span>
+            <li class="navigation_item">PRofile</li>
+        </ul>
+        <div class="boxed_item_smaller_holder">
+            <a href="#"><h1 class="boxed_item boxed_item_smaller">
+                <i class="fa fa-user"></i>
+                Sign Up
+            </h1></a>
+        </div>
+    </div>
+    <div id="map"></div>
+    <script>
+      var map;
+	  function median(values) 
+	  {
+		values.sort( function(a,b) {return a - b;} );
+
+		var half = Math.floor(values.length/2);
+
+		if(values.length % 2)
+			return values[half];
+		else
+			return (values[half-1] + values[half]) / 2.0;
+	}
+	  function avg(locations)
+	  {
+		let sum={lat:0,lng:0};
+		for(let i=0;i<locations.length;i++)
+		{
+			sum.lat+=locations[i].lat;
+			sum.lng+=locations[i].lng;
+		}
+		 sum.lat=sum.lat/locations.length-1;
+		 sum.lng=sum.lng/locations.length-1;
+		 return sum;
+	  }
+	   function getLt(locations)
+	  {
+		let lat=[];
+		for(let i=0;i<locations.length;i++)
+		{
+			lat.push(locations[i].lat);
+		}
+		 return lat;
+	  }
+	  function getLg(locations)
+	  {
+		let lg=[];
+		for(let i=0;i<locations.length;i++)
+		{
+			lg.push(locations[i].lng);
+		}
+		 return lg;
+	  }
+       function initMap() {
+	//cenLat=avg(locations);
+	cenLat={lat:median(getLt(locations)),lng:median(getLg(locations))}
+	console.log(cenLat);
+	
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: cenLat//{lat: -28.024, lng: 140.887}
+        });
+
+        // Create an array of alphabetical characters used to label the markers.
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        // Add some markers to the map.
+        // Note: The code uses the JavaScript Array.prototype.map() method to
+        // create an array of markers based on a given "locations" array.
+        // The map() method here has nothing to do with the Google Maps API.
+        var markers = locations.map(function(location, i) {
+          return new google.maps.Marker({
+            position: location,
+            label: labels[i % labels.length],
+			map:map,
+			 mapTypeId: google.maps.MapTypeId.HYBRID
+          });
+        });
+
+        // Add a marker clusterer to manage the markers.
+      /*  var markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});*/
+      }
+
+      var locations = [
+        {lat: -31.563910, lng: 147.154312},
+        {lat: -33.718234, lng: 150.363181},
+        {lat: -33.727111, lng: 150.371124},
+        {lat: -33.848588, lng: 151.209834},
+        {lat: -33.851702, lng: 151.216968},
+        {lat: -34.671264, lng: 150.863657},
+        {lat: -35.304724, lng: 148.662905},
+        {lat: -36.817685, lng: 175.699196},
+        {lat: -36.828611, lng: 175.790222},
+        {lat: -37.750000, lng: 145.116667},
+        {lat: -37.759859, lng: 145.128708},
+        {lat: -37.765015, lng: 145.133858},
+        {lat: -37.770104, lng: 145.143299},
+        {lat: -37.773700, lng: 145.145187},
+        {lat: -37.774785, lng: 145.137978},
+        {lat: -37.819616, lng: 144.968119},
+        {lat: -38.330766, lng: 144.695692},
+        {lat: -39.927193, lng: 175.053218},
+        {lat: -41.330162, lng: 174.865694},
+        {lat: -42.734358, lng: 147.439506},
+        {lat: -42.734358, lng: 147.501315},
+        {lat: -42.735258, lng: 147.438000},
+        {lat: -43.999792, lng: 170.463352}
+      ]
+    </script>
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiaI8u55dbq2uN8yk6_p8ZR4f0s8PK_P8&callback=initMap"
+    async defer></script>
+	<script src="sidebar.js"></script>
+  </body>
+</html>
